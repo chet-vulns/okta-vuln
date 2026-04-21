@@ -12,7 +12,8 @@ def load_env_file(env_file: str) -> None:
         if not entry or entry.startswith('#') or '=' not in entry:
             continue
         key, value = entry.split('=', 1)
-        os.environ[key.strip()] = value.strip()
+        cleaned_value = value.strip().strip('"').strip("'")
+        os.environ[key.strip()] = cleaned_value
 
 
 def main() -> None:
@@ -22,9 +23,7 @@ def main() -> None:
 
     print('Dummy Okta app loaded configuration:')
     print(f"client_id={os.environ.get('OKTA_CLIENT_ID', '')}")
-    secret = os.environ.get('OKTA_CLIENT_SECRET', '')
-    redacted = f"{secret[:4]}...{secret[-4:]}" if len(secret) > 8 else '********'
-    print(f'client_secret={redacted}')
+    print('client_secret=[REDACTED]')
 
 
 if __name__ == '__main__':
