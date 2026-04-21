@@ -3,7 +3,11 @@ from pathlib import Path
 
 
 def load_env_file(env_file: str) -> None:
-    for line in Path(env_file).read_text().splitlines():
+    path = Path(env_file)
+    if not path.exists():
+        raise FileNotFoundError(f'Environment file not found: {env_file}')
+
+    for line in path.read_text().splitlines():
         entry = line.strip()
         if not entry or entry.startswith('#') or '=' not in entry:
             continue
@@ -18,7 +22,9 @@ def main() -> None:
 
     print('Dummy Okta app loaded configuration:')
     print(f"client_id={os.environ.get('OKTA_CLIENT_ID', '')}")
-    print(f"client_secret={os.environ.get('OKTA_CLIENT_SECRET', '')}")
+    secret = os.environ.get('OKTA_CLIENT_SECRET', '')
+    redacted = f"{secret[:4]}...{secret[-4:]}" if len(secret) > 8 else '********'
+    print(f'client_secret={redacted}')
 
 
 if __name__ == '__main__':
